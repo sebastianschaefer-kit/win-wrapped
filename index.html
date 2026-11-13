@@ -67,6 +67,7 @@ button, a { font: inherit; color: inherit; }
 }
 .on-light .icon-btn { background: rgba(0,0,0,.1); color: var(--ink); }
 .icon-btn svg { width: 46%; height: 46%; }
+.icon-btn.broken { opacity: .55; }
 .hidden { opacity: 0; pointer-events: none; }
 .pill {
   position: absolute; z-index: 22; left: 50%; top: calc(env(safe-area-inset-top, 0px) + var(--u) * 6);
@@ -601,6 +602,9 @@ button, a { font: inherit; color: inherit; }
 
   // ---------- Music ----------
   let muted = false, musicStarted = false, musicDone = false, fadeTimer = null;
+  // The song cannot load, e.g., in the claude.ai preview, which blocks media from other sites.
+  let musicBroken = false;
+  function markBroken() { musicBroken = true; setMuted(true); muteBtn.classList.add("broken"); }
   audio.src = W.music.preview;
   audio.volume = 1;
   function setMuted(m) {
@@ -617,7 +621,7 @@ button, a { font: inherit; color: inherit; }
     if (restart) { try { audio.currentTime = 0; } catch (e) {} }
     const p = audio.play();
     musicStarted = true;
-    if (p && p.catch) p.catch(() => setMuted(true));
+    if (p && p.catch) p.catch((e) => { if (audio.error || (e && e.name === "NotSupportedError")) markBroken(); else setMuted(true); });
   }
   function fadeOutMusic(ms) {
     clearInterval(fadeTimer);
@@ -628,7 +632,7 @@ button, a { font: inherit; color: inherit; }
       if (k >= steps) { clearInterval(fadeTimer); audio.pause(); musicDone = true; }
     }, ms / steps);
   }
-  audio.addEventListener("error", () => setMuted(true));
+  audio.addEventListener("error", markBroken);
   if (params.has("mute")) setMuted(true);
 
   // ---------- Story state ----------
@@ -739,6 +743,7 @@ button, a { font: inherit; color: inherit; }
   });
   muteBtn.addEventListener("click", (e) => {
     e.stopPropagation();
+    if (musicBroken) { flash(window.self !== window.top ? "No music in this preview" : "The music could not load"); return; }
     if (!musicStarted || audio.paused) { setMuted(false); playMusic(false); return; }
     setMuted(!muted);
   });
