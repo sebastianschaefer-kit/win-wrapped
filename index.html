@@ -554,7 +554,6 @@ button, a { font: inherit; color: inherit; }
         <p class="p fx" style="--d:.9"><b>Your WIN PR Taskforce</b></p>
         <div class="actions fx" style="--d:1.2">
           <button class="btn" type="button" data-act="replay">↺ Watch again</button>
-          <button class="btn ghost" type="button" data-act="share">Share</button>
           <a class="btn ghost" href="${esc(W.linkedinPage)}" target="_blank" rel="noopener">Follow WIN ↗</a>
         </div>
         <p class="fine fx" style="--d:1.5">Data: WIN's LinkedIn Page analytics, ${dayYear(W.start)} to ${dayYear(W.end)}. Music: ${esc(W.music.credit)}, preview via <a href="${esc(W.music.link)}" target="_blank" rel="noopener" style="color:inherit">Apple Music</a>. ${legal()}</p>
@@ -755,7 +754,6 @@ button, a { font: inherit; color: inherit; }
   story.addEventListener("click", (e) => {
     const act = e.target.closest("[data-act]");
     if (act && act.dataset.act === "replay") replay();
-    if (act && act.dataset.act === "share") doShare();
     // On the cover, a tap anywhere but a link starts the story (and the music, within the tap).
     if (cur === 0 && !e.target.closest("a")) start();
   });
@@ -780,14 +778,6 @@ button, a { font: inherit; color: inherit; }
     else if (wasPlaying) resume();
   });
 
-  async function doShare() {
-    const data = { title: "WIN Wrapped " + W.year, text: "Our year on LinkedIn, in about 1½ minutes.", url: location.href };
-    try {
-      if (navigator.share) { await navigator.share(data); return; }
-      await navigator.clipboard.writeText(location.href);
-      flash("Link copied");
-    } catch (e) { if (e && e.name !== "AbortError") flash("Copy the link from the address bar"); }
-  }
   function flash(msg) {
     toast.textContent = msg; toast.classList.add("show");
     setTimeout(() => toast.classList.remove("show"), 1800);
