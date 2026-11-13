@@ -553,7 +553,9 @@ button, a { font: inherit; color: inherit; }
 
   // ---------- Layout: full screen on phones, a 9:16 card elsewhere ----------
   function fit() {
-    const vw = window.innerWidth, vh = window.innerHeight;
+    // Where the host pads the page for the phone's system bars (e.g., the claude.ai app), fit inside that padding.
+    const root = getComputedStyle(document.documentElement);
+    const vw = window.innerWidth, vh = window.innerHeight - parseFloat(root.paddingTop || 0) - parseFloat(root.paddingBottom || 0);
     let w = vw, h = vh;
     const card = vw / vh > 0.75;
     if (card) { h = Math.min(vh - 32, 960); w = Math.round(h * 9 / 16); }
