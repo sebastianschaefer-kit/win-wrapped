@@ -160,8 +160,13 @@ button, a { font: inherit; color: inherit; }
 
 /* Top 5 */
 .rows { display: flex; flex-direction: column; gap: calc(var(--u) * 3.6); }
-.row { display: grid; grid-template-columns: calc(var(--u) * 11) 1fr; align-items: center; gap: calc(var(--u) * 3); }
-.row .rank { font-family: var(--display); font-weight: 800; font-stretch: condensed; font-size: calc(var(--u) * 13); line-height: .8; color: var(--acc); }
+.row { display: grid; grid-template-columns: calc(var(--u) * 7) calc(var(--u) * 13) 1fr; align-items: center; gap: calc(var(--u) * 3); }
+.row .rank { font-family: var(--display); font-weight: 800; font-stretch: condensed; font-size: calc(var(--u) * 11); line-height: .8; color: var(--acc); }
+.row .thumb { width: calc(var(--u) * 13); height: calc(var(--u) * 13); border-radius: calc(var(--u) * 2); object-fit: cover; background: rgba(255,255,255,.08); }
+
+/* Post image on the single-post slides (height follows the card height) */
+.shot { display: block; width: 100%; height: calc(var(--hu) * 21); object-fit: cover; object-position: 50% 35%;
+  border-radius: calc(var(--u) * 3); background: rgba(0,0,0,.15); box-shadow: 0 calc(var(--u) * 2) calc(var(--u) * 6) rgba(0,0,0,.22); }
 .row .t { font: 700 calc(var(--u) * 4.5)/1.22 var(--text); }
 .row .m { font: 500 calc(var(--u) * 3.5)/1.3 var(--text); opacity: .75; margin-top: calc(var(--u) * .6); }
 
@@ -196,6 +201,9 @@ button, a { font: inherit; color: inherit; }
 .goal .done { position: absolute; inset: 0 auto 0 0; background: var(--acc); border-radius: calc(var(--u) * 3); }
 .goal-labels { display: flex; justify-content: space-between; font: 700 calc(var(--u) * 3.6)/1.3 var(--text); }
 .goal-labels b { display: block; font-size: calc(var(--u) * 4.6); }
+.wi { display: flex; align-items: center; gap: calc(var(--u) * 3.4); padding: calc(var(--u) * 3); border-radius: calc(var(--u) * 3); background: rgba(255,255,255,.12); }
+.wi img { flex: none; width: calc(var(--u) * 15); height: calc(var(--u) * 15); border-radius: calc(var(--u) * 2.4); }
+.wi .p b { display: block; }
 
 /* Outro */
 .actions { display: flex; flex-wrap: wrap; gap: calc(var(--u) * 2.6); }
@@ -303,6 +311,7 @@ button, a { font: inherit; color: inherit; }
   const stripes = (x, y, s, color, cls = "spin") =>
     `<svg class="shape ${cls}" style="left:${x}%;top:${y}%;width:calc(var(--u)*${s});height:calc(var(--u)*${s})" viewBox="0 0 100 100"><g fill="none" stroke="${color}" stroke-width="5">${[46, 36, 26, 16].map((r) => `<circle cx="50" cy="50" r="${r}"/>`).join("")}</g></svg>`;
 
+  const shot = (p, d) => p && p.image ? `<img class="shot fx" style="--d:${d}" src="${esc(p.image)}" alt="${esc(p.title)}">` : "";
   const linkTo = (url, label = "See the post") =>
     `<a class="link fx" style="--d:1.5" href="${esc(url)}" target="_blank" rel="noopener">${label} <span aria-hidden="true">↗</span></a>`;
   const legal = () => `<a href="${esc(W.legal.imprint)}" target="_blank" rel="noopener">Imprint</a> · <a href="${esc(W.legal.privacy)}" target="_blank" rel="noopener">Privacy</a>`;
@@ -374,6 +383,7 @@ button, a { font: inherit; color: inherit; }
         <p class="fine fx" style="--d:.2">by impressions</p></div>
         <div class="rows">${W.top.map((p, i) => `
           <div class="row fx" style="--d:${0.4 + i * 0.3}"><div class="rank">${i + 1}</div>
+            ${p.image ? `<img class="thumb" src="${esc(p.image)}" alt="">` : `<div class="thumb"></div>`}
             <div><div class="t">${esc(p.title)}</div><div class="m">${n(p.impressions)} impressions · ${esc(p.topic)}</div></div></div>`).join("")}
         </div>
       </div>` },
@@ -381,9 +391,10 @@ button, a { font: inherit; color: inherit; }
     { id: "seen", dur: 6, theme: "t-seen", html: () => {
       const p = W.mostSeen;
       return `
-      <div class="deco">${flower(60, -14, 56, "#ffd23f")}${sparkle(8, 80, 8, "#0b0b0b")}</div>
+      <div class="deco">${flower(60, -14, 56, "#ffd23f")}${sparkle(84, 90, 8, "#0b0b0b")}</div>
       <div class="content">
         <div class="kicker fx" style="--d:.1">Our #1 post · ${day(p.date)}</div>
+        ${shot(p, .2)}
         <h2 class="display md fx" style="--d:.3">${esc(p.title)}</h2>
         <div class="stats fx" style="--d:.7">
           <div class="stat"><b data-count="${p.impressions}">${n(p.impressions)}</b><span>impressions</span></div>
@@ -397,11 +408,12 @@ button, a { font: inherit; color: inherit; }
     { id: "loved", dur: 6, theme: "t-loved light-text", html: () => {
       const p = W.mostLoved;
       return `
-      <div class="deco">${sparkle(74, 8, 14, "#ffd23f", "twinkle")}${sparkle(14, 78, 7, "#fff4e2", "twinkle", 1.4)}${ring(56, 74, 56, "#ff5fa2", 4)}</div>
+      <div class="deco">${sparkle(74, 8, 14, "#ffd23f", "twinkle")}${sparkle(8, 92, 6, "#fff4e2", "twinkle", 1.4)}${ring(56, 74, 56, "#ff5fa2", 4)}</div>
       <div class="content">
         <div class="kicker fx" style="--d:.1">Most loved ❤️ · ${day(p.date)}</div>
+        ${shot(p, .2)}
         <h2 class="display md fx" style="--d:.3">${esc(p.title)}</h2>
-        <div><div class="display huge fx acc fit" data-max="40" style="--d:.7" data-count="${p.reactions}">${n(p.reactions)}</div>
+        <div><div class="display huge fx acc fit" data-max="30" style="--d:.7" data-count="${p.reactions}">${n(p.reactions)}</div>
         <div class="unit fx tight" style="--d:.9">reactions</div></div>
         <p class="p fx" style="--d:1.2">${times(p.factor) === "more than twice" ? "More than twice as many" : `${times(p.factor)} as many`} as any other post.</p>
         ${linkTo(p.url)}
@@ -410,11 +422,12 @@ button, a { font: inherit; color: inherit; }
     { id: "click", dur: 6, theme: "t-click", html: () => {
       const p = W.mostClicked, rate = Math.round((p.clicks / p.impressions) * 100);
       return `
-      <div class="deco">${blob(58, 70, 58, "#14205a", "spin")}${disc(-10, -8, 34, "#ffd23f")}</div>
+      <div class="deco">${blob(62, 82, 48, "#14205a", "spin")}${disc(-10, -8, 34, "#ffd23f")}</div>
       <div class="content">
         <div class="kicker fx" style="--d:.1">Most clicked · ${day(p.date)}</div>
+        ${shot(p, .2)}
         <h2 class="display md fx" style="--d:.3">${esc(p.title)}</h2>
-        <div><div class="display huge fx fit" data-max="40" style="--d:.6" data-count="${rate}" data-suffix="%">${rate}%</div>
+        <div><div class="display huge fx fit" data-max="30" style="--d:.6" data-count="${rate}" data-suffix="%">${rate}%</div>
         <div class="unit fx tight" style="--d:.8">of everyone who saw it clicked.</div></div>
         <p class="p fx" style="--d:1.1">The best click rate of the year. ${QUIPS[p.id] || ""}</p>
         ${linkTo(p.url)}
@@ -426,8 +439,9 @@ button, a { font: inherit; color: inherit; }
       <div class="deco">${sparkle(76, 10, 12, "#ffd23f")}${sparkle(10, 22, 6, "#ffd23f", "twinkle", .8)}${disc(52, 76, 60, "#1e2f7d")}</div>
       <div class="content">
         <div class="kicker fx" style="--d:.1">Plot twist 😎</div>
+        ${shot(p, .2)}
         <h2 class="display md fx" style="--d:.3">Our biggest day: ${day(d.date).replace(" ", "&nbsp;")}.</h2>
-        <div><div class="display xl fx acc fit" data-max="34" style="--d:.6" data-count="${d.impressions}">${n(d.impressions)}</div>
+        <div><div class="display xl fx acc fit" data-max="28" style="--d:.6" data-count="${d.impressions}">${n(d.impressions)}</div>
         <div class="unit fx tight" style="--d:.8">impressions in one day</div></div>
         ${p ? `<p class="p fx" style="--d:1.1">${QUIPS[p.id] || "The post behind it:"} <b>“${esc(p.title)}”</b></p>${linkTo(p.url)}` : ""}
       </div>`; } },
@@ -474,18 +488,18 @@ button, a { font: inherit; color: inherit; }
       </div>` },
 
     { id: "words", dur: 7, theme: "t-words light-text", html: () => {
-      const parts = new Set(W.topTenPeople);
-      const words = W.words.filter((w) => !parts.has(w.word)).slice(0, 22);
+      // The person's last name is highlighted and sits in the center; all other words keep their place by count.
+      const last = king.name.split(" ").pop().toLowerCase().replace("ä", "ae");
+      const words = W.words.slice(0, 24);
       const counts = words.map((w) => w.posts);
       const lo = Math.min(...counts), hi = Math.max(...counts);
       const size = (c) => 4.2 + ((c - lo) / (hi - lo)) * 8.5;
-      // Biggest words in the middle, the name in the very center.
+      const others = words.filter((w) => w.word !== last);
       const arranged = [];
-      words.forEach((w, i) => (i % 2 ? arranged.push(w) : arranged.unshift(w)));
-      const mid = Math.floor(arranged.length / 2);
-      const name = `<span class="name" style="font-size:calc(var(--u)*${Math.max(size(king.posts) + 2, 9.5)})">👑 ${esc(king.name)}</span>`;
+      others.forEach((w, i) => (i % 2 ? arranged.push(w) : arranged.unshift(w)));
       const html = arranged.map((w) => `<span class="${w.posts >= hi * .6 ? "top" : w.posts >= hi * .3 ? "mid" : ""}" style="font-size:calc(var(--u)*${size(w.posts).toFixed(2)})">${esc(w.word)}</span>`);
-      html.splice(mid, 0, name);
+      const hit = words.find((w) => w.word === last);
+      if (hit) html.splice(Math.floor(html.length / 2), 0, `<span class="name" style="font-size:calc(var(--u)*${(size(hit.posts) + 2).toFixed(2)})">👑 ${esc(hit.word)}</span>`);
       const onlyOne = W.topTenPeople.length > 0 && W.topTenPeople.every((w) => king.name.toLowerCase().replace("ä", "ae").includes(w));
       return `
       <div class="deco">${sparkle(84, 8, 7, "#cdf564")}${sparkle(6, 86, 6, "#ff5fa2", "twinkle", 1)}</div>
@@ -504,7 +518,7 @@ button, a { font: inherit; color: inherit; }
       </div>` },
 
     { id: "aim2", dur: 7, theme: "t-aim2 light-text", html: () => `
-      <div class="deco">${stripes(66, -22, 54, "#ff5fa2")}${sparkle(8, 82, 8, "#cdf564")}</div>
+      <div class="deco">${stripes(66, -22, 54, "#ff5fa2")}${sparkle(84, 90, 8, "#cdf564")}</div>
       <div class="content">
         <div class="kicker fx" style="--d:.1">2027 · Aim #2</div>
         <div><div class="display xl fx acc fit" data-max="40" style="--d:.3">${n(W.goal.impressions / 1000)}k+</div>
@@ -513,7 +527,9 @@ button, a { font: inherit; color: inherit; }
           <div class="goal"><div class="done" style="width:${W.goal.share * 100}%"></div></div>
           <div class="goal-labels" style="margin-top:calc(var(--u)*1.6)"><div><b>${n(W.impressions)}</b>this year</div><div style="text-align:right"><b>${n(W.goal.impressions)}</b>2027</div></div>
         </div>
-        <p class="p fx" style="--d:1.3">At about ${n(Math.round(W.avgPerPost / 50) * 50)} impressions per post, that's ~${W.goal.postsNeeded} more posts. WI 2027 comes to Karlsruhe, so let's make some <span class="nowrap">noise. 📣</span></p>
+        <p class="p fx" style="--d:1.2">At about ${n(Math.round(W.avgPerPost / 50) * 50)} impressions per post, that's ~${W.goal.postsNeeded} more posts.</p>
+        ${W.wi2027 ? `<div class="wi fx" style="--d:1.6"><img src="${esc(W.wi2027.logo)}" alt="WI 2027 logo">
+          <p class="p"><b>WI 2027 comes to Karlsruhe.</b>${esc(W.wi2027.when)}. Let's make some <span class="nowrap">noise. 📣</span></p></div>` : ""}
       </div>` },
 
     { id: "aim3", dur: 6, theme: "t-aim3", html: () => `
@@ -564,6 +580,7 @@ button, a { font: inherit; color: inherit; }
     story.style.height = h + "px";
     story.classList.toggle("card", card);
     document.documentElement.style.setProperty("--u", (w / 100) + "px");
+    document.documentElement.style.setProperty("--hu", (h / 100) + "px");
   }
   // Key numbers fill the width of the slide, up to their data-max (in units of 1% card width).
   function fitNumbers() {
