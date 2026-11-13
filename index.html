@@ -311,7 +311,7 @@ button, a { font: inherit; color: inherit; }
   const stripes = (x, y, s, color, cls = "spin") =>
     `<svg class="shape ${cls}" style="left:${x}%;top:${y}%;width:calc(var(--u)*${s});height:calc(var(--u)*${s})" viewBox="0 0 100 100"><g fill="none" stroke="${color}" stroke-width="5">${[46, 36, 26, 16].map((r) => `<circle cx="50" cy="50" r="${r}"/>`).join("")}</g></svg>`;
 
-  const shot = (p, d) => p && p.image ? `<img class="shot fx" style="--d:${d}" src="${esc(p.image)}" alt="${esc(p.title)}">` : "";
+  const shot = (p, d) => p && p.image ? `<img class="shot fx" style="--d:${d}${p.focus ? `;object-position:${esc(p.focus)}` : ""}" src="${esc(p.image)}" alt="${esc(p.title)}">` : "";
   const linkTo = (url, label = "See the post") =>
     `<a class="link fx" style="--d:1.5" href="${esc(url)}" target="_blank" rel="noopener">${label} <span aria-hidden="true">↗</span></a>`;
   const legal = () => `<a href="${esc(W.legal.imprint)}" target="_blank" rel="noopener">Imprint</a> · <a href="${esc(W.legal.privacy)}" target="_blank" rel="noopener">Privacy</a>`;
